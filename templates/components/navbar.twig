@@ -1,67 +1,103 @@
 <nav class="bg-card/80 backdrop-blur-md border-b border-primary/10 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 py-4">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-8">
-                <a href="/dashboard" class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                        <span class="font-bold text-white">T</span>
-                    </div>
-                    <span class="font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                        TicketFlow
-                    </span>
-                </a>
+  <div class="max-w-7xl mx-auto px-6 py-4">
+    <div class="flex items-center justify-between">
+      <!-- Logo -->
+      <div class="flex items-center gap-2">
+        <a href="/dashboard" class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+            <span class="font-bold text-white">T</span>
+          </div>
+          <span class="font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            TicketFlow
+          </span>
+        </a>
+      </div>
 
-                <div class="flex items-center gap-2 bg-secondary/50 p-1 rounded-full border border-primary/10">
-                    <a href="/dashboard"
-                       class="px-5 py-2 rounded-full transition-all {{ currentPage == 'dashboard' ? 'bg-card shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground' }}">
-                        Dashboard
-                    </a>
-                    <a href="/tickets"
-                       class="px-5 py-2 rounded-full transition-all {{ currentPage == 'tickets' ? 'bg-card shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground' }}">
-                        Tickets
-                    </a>
-                </div>
-            </div>
+      <!-- Hamburger Button (visible on mobile) -->
+      <button
+        id="mobileMenuBtn"
+        class="sm:hidden flex items-center justify-center w-10 h-10 rounded-md hover:bg-secondary/50 transition"
+      >
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
 
-            <div class="flex items-center gap-3">
-                <div class="flex items-center gap-2 px-3 py-2 bg-secondary/50 rounded-full">
-                    <i data-lucide="user" class="w-4 h-4 text-muted-foreground"></i>
-                    <span class="text-sm">{{ user.name|default('Admin') }}</span>
-                </div>
-
-                <!-- 🧩 Added ID for logout script -->
-                <a id="logoutBtn" href="/logout" class="rounded-full p-2 hover:bg-secondary/50 transition-all">
-                    <i data-lucide="log-out" class="w-4 h-4"></i>
-                </a>
-            </div>
+      <!-- Desktop Nav Links -->
+      <div class="hidden sm:flex items-center gap-8">
+        <div class="flex items-center gap-2 bg-secondary/50 p-1 rounded-full border border-primary/10">
+          <a href="/dashboard"
+            class="px-5 py-2 rounded-full transition-all {{ currentPage == 'dashboard' ? 'bg-card shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground' }}">
+            Dashboard
+          </a>
+          <a href="/tickets"
+            class="px-5 py-2 rounded-full transition-all {{ currentPage == 'tickets' ? 'bg-card shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground' }}">
+            Tickets
+          </a>
         </div>
+
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2 px-3 py-2 bg-secondary/50 rounded-full">
+            <i data-lucide="user" class="w-4 h-4 text-muted-foreground"></i>
+            <span class="text-sm">{{ user.name|default('Admin') }}</span>
+          </div>
+
+          <a id="logoutBtn" href="/logout" class="rounded-full p-2 hover:bg-secondary/50 transition-all">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </a>
+        </div>
+      </div>
     </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="sm:hidden hidden mt-4 space-y-3 border-t border-border/50 pt-4">
+      <a href="/dashboard"
+        class="block px-4 py-2 rounded-md transition-all {{ currentPage == 'dashboard' ? 'bg-card shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground' }}">
+        Dashboard
+      </a>
+      <a href="/tickets"
+        class="block px-4 py-2 rounded-md transition-all {{ currentPage == 'tickets' ? 'bg-card shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground' }}">
+        Tickets
+      </a>
+
+      <div class="flex items-center justify-between bg-secondary/50 px-4 py-2 rounded-md">
+        <div class="flex items-center gap-2">
+          <i data-lucide="user" class="w-4 h-4 text-muted-foreground"></i>
+          <span class="text-sm">{{ user.name|default('Admin') }}</span>
+        </div>
+        <a id="logoutBtnMobile" href="/logout" class="rounded-full p-2 hover:bg-secondary/50 transition-all">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </div>
+  </div>
 </nav>
 
-<!-- 🧠 Logout Script: clears localStorage before redirect -->
+<!-- 🧠 Responsive & Logout Script -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const logoutBtn = document.getElementById('logoutBtn');
-  if (!logoutBtn) return;
+  // 🧩 Toggle Mobile Menu
+  const mobileBtn = document.getElementById('mobileMenuBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
 
-  logoutBtn.addEventListener('click', async (e) => {
-    e.preventDefault();
+  if (mobileBtn && mobileMenu) {
+    mobileBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+  }
 
-    // Optional: confirm logout
-    if (!confirm('Are you sure you want to log out?')) return;
-
-    try {
-      // 🟢 Call logout route (clears PHP session)
-      await fetch('/logout?json=1');
-    } catch (err) {
-      console.warn('Logout request failed, clearing local session anyway.');
-    }
-
-    // 🧹 Clear client-side localStorage session
-    localStorage.removeItem('ticketapp_session');
-
-    // Redirect to home or login page
-    window.location.href = '/login';
+  // 🧩 Logout (both desktop & mobile)
+  const logoutLinks = document.querySelectorAll('#logoutBtn, #logoutBtnMobile');
+  logoutLinks.forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (!confirm('Are you sure you want to log out?')) return;
+      try {
+        await fetch('/logout?json=1');
+      } catch (err) {
+        console.warn('Logout request failed, clearing local session anyway.');
+      }
+      localStorage.removeItem('ticketapp_session');
+      window.location.href = '/login';
+    });
   });
 });
 </script>
