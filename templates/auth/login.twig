@@ -1,0 +1,65 @@
+{% extends "base.twig" %}
+
+{% block title %}Login - Ticket Management System{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center px-6 py-12">
+    <div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/5 to-background -z-10"></div>
+    
+    <div class="w-full max-w-md">
+        <div class="bg-card rounded-3xl border border-border/50 shadow-2xl p-8">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-purple-pink mb-6">
+                    <i data-lucide="ticket" class="w-8 h-8 text-white"></i>
+                </div>
+                <h2 class="mb-2">Welcome Back</h2>
+                <p class="text-muted-foreground">Sign in to access your ticket dashboard</p>
+            </div>
+
+            <!-- Form -->
+            <form method="POST" action="/login" class="space-y-5">
+                <div>
+                    <label for="email" class="block text-sm mb-1.5">Email</label>
+                    <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        required
+                        class="w-full mt-1.5 h-12 rounded-xl border border-border bg-background px-4 focus:outline-none focus:ring-2 focus:ring-primary"
+                        placeholder="you@example.com"
+                    />
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm mb-1.5">Password</label>
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        required
+                        minlength="6"
+                        class="w-full mt-1.5 h-12 rounded-xl border border-border bg-background px-4 focus:outline-none focus:ring-2 focus:ring-primary"
+                        placeholder="••••••••"
+                    />
+                </div>
+
+                <button
+                    type="submit"
+                    class="w-full h-12 rounded-xl gradient-purple-pink border-2 border-neon-green shadow-lg hover:shadow-neon-green/20 text-white transition-all"
+                >
+                    Sign In
+                </button>
+            </form>
+
+            <!-- Footer -->
+            <div class="mt-6 text-center">
+                <p class="text-sm text-muted-foreground">
+                    Don't have an account? 
+                    <a href="/signup" class="text-primary hover:underline">Sign up</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

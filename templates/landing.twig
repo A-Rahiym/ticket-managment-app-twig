@@ -1,0 +1,127 @@
+{% extends "base.twig" %}
+
+{% block title %}Welcome - Ticket Management System{% endblock %}
+
+{% block content %}
+<div class="min-h-screen">
+    <!-- Hero Section -->
+    <section class="relative min-h-[90vh] flex items-center justify-center px-6 py-20 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/5 to-background -z-10"></div>
+        
+        <div class="max-w-5xl mx-auto text-center relative z-10">
+            <div class="inline-block mb-6 px-4 py-2 bg-primary/10 rounded-full border border-primary/20">
+                <p class="text-sm text-primary">Welcome to Modern Support</p>
+            </div>
+            
+            <h1 class="mb-6 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                Streamline Your Support with Smart Ticket Management
+            </h1>
+            
+            <p class="mb-10 text-muted-foreground max-w-2xl mx-auto">
+                Manage customer inquiries efficiently with our intuitive ticket system. 
+                Track, prioritize, and resolve issues faster than ever before.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/signup">
+                    <button class="rounded-full px-8 py-3 text-white gradient-purple-pink border-2 border-neon-green hover:border-neon-green shadow-lg hover:shadow-neon-green/20 transition-all">
+                        Get Started
+                        <i data-lucide="arrow-right" class="inline w-4 h-4 ml-2"></i>
+                    </button>
+                </a>
+                <a href="/login">
+                    <button class="rounded-full px-8 py-3 border-2 border-neon-green hover:border-neon-green hover:bg-neon-green/10 shadow-md transition-all">
+                        Sign In
+                    </button>
+                </a>
+            </div>
+        </div>
+
+        <!-- Wave Background -->
+        <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-[0]">
+            <svg class="relative block w-full h-[80px] md:h-[120px]" viewBox="0 0 1200 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="wave-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:hsl(280, 90%, 60%);stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:hsl(190, 90%, 50%);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:hsl(330, 85%, 60%);stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <path d="M0,64 C240,100 480,100 720,64 C960,28 1200,28 1200,64 L1200,120 L0,120 Z" fill="url(#wave-gradient)" />
+                <path d="M0,80 C320,40 640,40 960,80 C1120,100 1200,100 1200,80 L1200,120 L0,120 Z" fill="hsl(250, 100%, 98%)" opacity="0.5" />
+            </svg>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="px-6 py-20 bg-muted/30">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <div class="inline-block mb-4 px-4 py-2 bg-primary/10 rounded-full border border-primary/20">
+                    <p class="text-sm text-primary">Features</p>
+                </div>
+                <h2 class="mb-4">Everything You Need to Succeed</h2>
+                <p class="text-muted-foreground max-w-2xl mx-auto">
+                    Powerful features designed to help you manage support tickets efficiently and delight your customers.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Feature 1 -->
+                <div class="group p-8 bg-card rounded-2xl border border-border/50 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                    <div class="w-14 h-14 rounded-xl gradient-purple-pink flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="zap" class="w-7 h-7 text-white"></i>
+                    </div>
+                    <h3 class="mb-3">Lightning Fast</h3>
+                    <p class="text-muted-foreground">Quick ticket creation and resolution with an intuitive interface designed for speed.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="group p-8 bg-card rounded-2xl border border-border/50 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="shield" class="w-7 h-7 text-white"></i>
+                    </div>
+                    <h3 class="mb-3">Secure & Reliable</h3>
+                    <p class="text-muted-foreground">Enterprise-grade security ensuring your data is always protected and accessible.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="group p-8 bg-card rounded-2xl border border-border/50 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="bar-chart-3" class="w-7 h-7 text-white"></i>
+                    </div>
+                    <h3 class="mb-3">Powerful Analytics</h3>
+                    <p class="text-muted-foreground">Gain insights with comprehensive reports and real-time ticket statistics.</p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="group p-8 bg-card rounded-2xl border border-border/50 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="users" class="w-7 h-7 text-white"></i>
+                    </div>
+                    <h3 class="mb-3">Team Collaboration</h3>
+                    <p class="text-muted-foreground">Assign tickets, track progress, and collaborate seamlessly with your team.</p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="group p-8 bg-card rounded-2xl border border-border/50 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="bell" class="w-7 h-7 text-white"></i>
+                    </div>
+                    <h3 class="mb-3">Smart Notifications</h3>
+                    <p class="text-muted-foreground">Stay updated with intelligent alerts for ticket updates and assignments.</p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="group p-8 bg-card rounded-2xl border border-border/50 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="clock" class="w-7 h-7 text-white"></i>
+                    </div>
+                    <h3 class="mb-3">24/7 Availability</h3>
+                    <p class="text-muted-foreground">Access your tickets anytime, anywhere with our cloud-based platform.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

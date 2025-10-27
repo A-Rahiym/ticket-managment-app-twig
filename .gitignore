@@ -1,0 +1,46 @@
+# Dependency management
+/vendor/
+/node_modules/
+
+.bat 
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE and OS generated files
+.idea/
+.vscode/
+.DS_Store
+ehthumbs.db
+Thumbs.db
+
+# Log files
+*.log
+
+# Cache and temporary files
+/storage/*.key
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+/bootstrap/cache/*.php
+
+# Build artifacts
+/public/build/
+/public/hot
+
+# Test results
+/phpunit.xml.dist
+/coverage/
+
+# Composer and Yarn lock files (optional, depending on project setup)
+composer.lock
+yarn.lock
+
+# Other common ignored files
+*.bak
+*.swp
+*.swo
+*.tmp

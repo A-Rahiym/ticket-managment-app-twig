@@ -1,0 +1,325 @@
+{% extends "base.twig" %}
+
+{% block title %}Tickets - Ticket Management System{% endblock %}
+
+{% block navbar %}
+    {% include 'components/navbar.twig' with {'currentPage': 'tickets', 'user': user} %}
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen px-6 py-12">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
+            <div>
+                <h2 class="mb-2">Tickets</h2>
+                <p class="text-muted-foreground">
+                    Manage and track all support tickets
+                </p>
+            </div>
+            <button onclick="openCreateModal()" class="rounded-full px-6 py-3 bg-primary text-white border-2 border-neon-green shadow-md hover:shadow-neon-green/20 transition-all">
+                <i data-lucide="plus" class="inline w-4 h-4 mr-2"></i>
+                New Ticket
+            </button>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-card rounded-2xl border border-border/50 shadow-sm mb-6">
+            <div class="p-6">
+                <div class="flex flex-col lg:flex-row gap-4">
+                    <div class="flex-1 relative">
+                        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"></i>
+                        <input
+                            type="text"
+                            id="searchInput"
+                            placeholder="Search tickets..."
+                            class="w-full pl-10 h-10 rounded-xl border border-border bg-background px-4 focus:outline-none focus:ring-2 focus:ring-primary"
+                            onkeyup="filterTickets()"
+                        />
+                    </div>
+                    
+                    <div class="flex gap-2 bg-secondary/50 p-1 rounded-xl">
+                        <button onclick="filterByStatus('all')" class="filter-btn px-4 py-2 rounded-lg text-sm transition-all bg-card shadow-sm font-medium" data-status="all">
+                            All
+                        </button>
+                        <button onclick="filterByStatus('open')" class="filter-btn px-4 py-2 rounded-lg text-sm transition-all text-muted-foreground hover:text-foreground" data-status="open">
+                            Open
+                        </button>
+                        <button onclick="filterByStatus('in_progress')" class="filter-btn px-4 py-2 rounded-lg text-sm transition-all text-muted-foreground hover:text-foreground" data-status="in_progress">
+                            In Progress
+                        </button>
+                        <button onclick="filterByStatus('closed')" class="filter-btn px-4 py-2 rounded-lg text-sm transition-all text-muted-foreground hover:text-foreground" data-status="closed">
+                            Closed
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tickets Table -->
+        <div class="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full" id="ticketsTable">
+                    <thead class="border-b border-border/50">
+                        <tr>
+                            <th class="text-left p-4 text-sm font-medium text-muted-foreground">Title</th>
+                            <th class="text-left p-4 text-sm font-medium text-muted-foreground">Assignee</th>
+                            <th class="text-left p-4 text-sm font-medium text-muted-foreground">Status</th>
+                            <th class="text-left p-4 text-sm font-medium text-muted-foreground">Priority</th>
+                            <th class="text-left p-4 text-sm font-medium text-muted-foreground">Created</th>
+                            <th class="text-left p-4 w-12"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets %}
+                        <tr class="ticket-row border-b border-border/30 hover:bg-muted/50 transition-colors" data-status="{{ ticket.status }}" data-title="{{ ticket.title|lower }}" data-assignee="{{ ticket.assignee|lower }}">
+                            <td class="p-4">
+                                <div>
+                                    <p class="font-medium">{{ ticket.title }}</p>
+                                    {% if ticket.description %}
+                                    <p class="text-sm text-muted-foreground line-clamp-1 mt-1">{{ ticket.description }}</p>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="p-4">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">
+                                        {{ ticket.assignee|split(' ')|map(w => w[0])|join('')|upper|slice(0, 2) }}
+                                    </div>
+                                    <span class="text-sm">{{ ticket.assignee }}</span>
+                                </div>
+                            </td>
+                            <td class="p-4">
+                                {% if ticket.status == 'open' %}
+                                <span class="inline-flex px-3 py-1 rounded-full text-xs bg-green-100 text-green-700 border border-green-200">Open</span>
+                                {% elseif ticket.status == 'in_progress' %}
+                                <span class="inline-flex px-3 py-1 rounded-full text-xs bg-amber-100 text-amber-700 border border-amber-200">In Progress</span>
+                                {% else %}
+                                <span class="inline-flex px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-700 border border-gray-200">Closed</span>
+                                {% endif %}
+                            </td>
+                            <td class="p-4">
+                                {% if ticket.priority == 'high' %}
+                                <span class="inline-flex px-3 py-1 rounded-full text-xs border border-red-300 text-red-700 bg-red-50">High</span>
+                                {% elseif ticket.priority == 'medium' %}
+                                <span class="inline-flex px-3 py-1 rounded-full text-xs border border-primary/30 text-primary bg-primary/5">Medium</span>
+                                {% else %}
+                                <span class="inline-flex px-3 py-1 rounded-full text-xs border border-blue-300 text-blue-700 bg-blue-50">Low</span>
+                                {% endif %}
+                            </td>
+                            <td class="p-4 text-sm text-muted-foreground">
+                                {{ ticket.createdAt|date('M d, Y') }}
+                            </td>
+                            <td class="p-4">
+                                <div class="relative inline-block">
+                                    <button onclick="toggleMenu({{ ticket.id }})" class="p-2 hover:bg-muted rounded-lg">
+                                        <i data-lucide="more-horizontal" class="w-4 h-4"></i>
+                                    </button>
+                                    <div id="menu-{{ ticket.id }}" class="hidden absolute right-0 mt-2 w-48 bg-card rounded-xl border border-border shadow-lg z-10">
+                                        <button onclick="openEditModal({{ ticket.id }}, '{{ ticket.title|e('js') }}', '{{ ticket.description|e('js') }}', '{{ ticket.status }}', '{{ ticket.priority }}', '{{ ticket.assignee|e('js') }}')" class="w-full text-left px-4 py-2 hover:bg-muted rounded-t-xl flex items-center gap-2">
+                                            <i data-lucide="edit-2" class="w-4 h-4"></i>
+                                            Edit
+                                        </button>
+                                        <button onclick="openDeleteModal({{ ticket.id }})" class="w-full text-left px-4 py-2 hover:bg-muted rounded-b-xl text-red-600 flex items-center gap-2">
+                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create/Edit Modal -->
+<div id="ticketModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-card rounded-3xl max-w-2xl w-full p-8 max-h-[90vh] overflow-y-auto">
+        <h2 id="modalTitle" class="mb-6">Create New Ticket</h2>
+        
+        <form id="ticketForm" method="POST" action="/tickets" class="space-y-5">
+            <input type="hidden" id="ticketId" name="ticketId" value="">
+            
+            <div>
+                <label for="title" class="block text-sm font-medium mb-1.5">Title *</label>
+                <input
+                    id="title"
+                    name="title"
+                    type="text"
+                    required
+                    class="w-full h-11 rounded-xl border border-border bg-background px-4 focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="Enter ticket title"
+                />
+            </div>
+
+            <div>
+                <label for="assignee" class="block text-sm font-medium mb-1.5">Assignee *</label>
+                <input
+                    id="assignee"
+                    name="assignee"
+                    type="text"
+                    required
+                    class="w-full h-11 rounded-xl border border-border bg-background px-4 focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="Enter assignee name"
+                />
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="status" class="block text-sm font-medium mb-1.5">Status</label>
+                    <select id="status" name="status" class="w-full h-11 rounded-xl border border-border bg-background px-4 focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="open">Open</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="priority" class="block text-sm font-medium mb-1.5">Priority</label>
+                    <select id="priority" name="priority" class="w-full h-11 rounded-xl border border-border bg-background px-4 focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label for="description" class="block text-sm font-medium mb-1.5">Description</label>
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="4"
+                    class="w-full rounded-xl border border-border bg-background px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="Enter ticket description (optional)"
+                ></textarea>
+            </div>
+
+            <div class="flex gap-3 justify-end">
+                <button type="button" onclick="closeModal()" class="px-6 py-2.5 rounded-xl border border-border hover:bg-muted transition-all">
+                    Cancel
+                </button>
+                <button type="submit" class="px-6 py-2.5 rounded-xl bg-primary text-white hover:bg-primary/90 transition-all">
+                    <span id="submitText">Create</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-card rounded-3xl max-w-md w-full p-8">
+        <h2 class="mb-4">Are you sure?</h2>
+        <p class="text-muted-foreground mb-6">
+            This action cannot be undone. This will permanently delete the ticket.
+        </p>
+        
+        <div class="flex gap-3 justify-end">
+            <button onclick="closeDeleteModal()" class="px-6 py-2.5 rounded-xl border border-border hover:bg-muted transition-all">
+                Cancel
+            </button>
+            <form id="deleteForm" method="POST" action="" class="inline">
+                <button type="submit" class="px-6 py-2.5 rounded-xl bg-destructive text-white hover:bg-destructive/90 transition-all">
+                    Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentStatusFilter = 'all';
+
+function openCreateModal() {
+    document.getElementById('modalTitle').textContent = 'Create New Ticket';
+    document.getElementById('submitText').textContent = 'Create';
+    document.getElementById('ticketForm').action = '/tickets';
+    document.getElementById('ticketForm').reset();
+    document.getElementById('ticketId').value = '';
+    document.getElementById('ticketModal').classList.remove('hidden');
+}
+
+function openEditModal(id, title, description, status, priority, assignee) {
+    document.getElementById('modalTitle').textContent = 'Edit Ticket';
+    document.getElementById('submitText').textContent = 'Update';
+    document.getElementById('ticketForm').action = '/tickets/' + id + '/edit';
+    document.getElementById('ticketId').value = id;
+    document.getElementById('title').value = title;
+    document.getElementById('description').value = description;
+    document.getElementById('status').value = status;
+    document.getElementById('priority').value = priority;
+    document.getElementById('assignee').value = assignee;
+    document.getElementById('ticketModal').classList.remove('hidden');
+    toggleMenu(id);
+}
+
+function closeModal() {
+    document.getElementById('ticketModal').classList.add('hidden');
+}
+
+function openDeleteModal(id) {
+    document.getElementById('deleteForm').action = '/tickets/' + id + '/delete';
+    document.getElementById('deleteModal').classList.remove('hidden');
+    toggleMenu(id);
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+}
+
+function toggleMenu(id) {
+    const menu = document.getElementById('menu-' + id);
+    const allMenus = document.querySelectorAll('[id^="menu-"]');
+    allMenus.forEach(m => {
+        if (m.id !== 'menu-' + id) m.classList.add('hidden');
+    });
+    menu.classList.toggle('hidden');
+}
+
+// Close menus when clicking outside
+document.addEventListener('click', function(event) {
+    if (!event.target.closest('[onclick^="toggleMenu"]') && !event.target.closest('[id^="menu-"]')) {
+        document.querySelectorAll('[id^="menu-"]').forEach(m => m.classList.add('hidden'));
+    }
+});
+
+function filterByStatus(status) {
+    currentStatusFilter = status;
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        if (btn.dataset.status === status) {
+            btn.className = 'filter-btn px-4 py-2 rounded-lg text-sm transition-all bg-card shadow-sm font-medium';
+        } else {
+            btn.className = 'filter-btn px-4 py-2 rounded-lg text-sm transition-all text-muted-foreground hover:text-foreground';
+        }
+    });
+    filterTickets();
+}
+
+function filterTickets() {
+    const searchText = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('.ticket-row');
+    
+    rows.forEach(row => {
+        const status = row.dataset.status;
+        const title = row.dataset.title;
+        const assignee = row.dataset.assignee;
+        
+        const matchesStatus = currentStatusFilter === 'all' || status === currentStatusFilter;
+        const matchesSearch = title.includes(searchText) || assignee.includes(searchText);
+        
+        if (matchesStatus && matchesSearch) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+</script>
+{% endblock %}

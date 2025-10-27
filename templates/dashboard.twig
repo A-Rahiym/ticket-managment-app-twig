@@ -1,0 +1,85 @@
+{% extends "base.twig" %}
+
+{% block title %}Dashboard - Ticket Management System{% endblock %}
+
+{% block navbar %}
+    {% include 'components/navbar.twig' with {'currentPage': 'dashboard', 'user': user} %}
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen px-6 py-12">
+    <div class="max-w-7xl mx-auto">
+        <div class="mb-10">
+            <h2 class="mb-2">Dashboard</h2>
+            <p class="text-muted-foreground">
+                Welcome back! Here's an overview of your tickets.
+            </p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total Tickets -->
+            <div class="bg-card rounded-2xl border border-border/50 p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                        <i data-lucide="ticket" class="w-6 h-6 text-primary"></i>
+                    </div>
+                    <span class="text-sm text-muted-foreground">Total Tickets</span>
+                </div>
+                <p class="text-foreground text-2xl font-semibold">{{ stats.total }}</p>
+            </div>
+
+            <!-- Open Tickets -->
+            <div class="bg-card rounded-2xl border border-border/50 p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+                        <i data-lucide="ticket" class="w-6 h-6 text-green-600"></i>
+                    </div>
+                    <span class="text-sm text-muted-foreground">Open</span>
+                </div>
+                <p class="text-foreground text-2xl font-semibold">{{ stats.open }}</p>
+            </div>
+
+            <!-- In Progress Tickets -->
+            <div class="bg-card rounded-2xl border border-border/50 p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
+                        <i data-lucide="clock" class="w-6 h-6 text-amber-600"></i>
+                    </div>
+                    <span class="text-sm text-muted-foreground">In Progress</span>
+                </div>
+                <p class="text-foreground text-2xl font-semibold">{{ stats.in_progress }}</p>
+            </div>
+
+            <!-- Closed Tickets -->
+            <div class="bg-card rounded-2xl border border-border/50 p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center">
+                        <i data-lucide="check-circle-2" class="w-6 h-6 text-gray-600"></i>
+                    </div>
+                    <span class="text-sm text-muted-foreground">Closed</span>
+                </div>
+                <p class="text-foreground text-2xl font-semibold">{{ stats.closed }}</p>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-card rounded-2xl border border-border/50 shadow-sm p-8 gradient-purple-pink">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div>
+                    <h3 class="mb-2 text-white">Ready to manage tickets?</h3>
+                    <p class="text-white/80">
+                        Create, update, and track all your support tickets in one place
+                    </p>
+                </div>
+                <a href="/tickets">
+                    <button class="rounded-full px-8 py-3 bg-white text-primary hover:bg-white/90 border-2 border-neon-green shadow-lg hover:shadow-neon-green/20 transition-all">
+                        View All Tickets
+                        <i data-lucide="arrow-right" class="inline w-4 h-4 ml-2"></i>
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

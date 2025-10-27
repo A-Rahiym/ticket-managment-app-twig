@@ -1,0 +1,35 @@
+<nav class="bg-card/80 backdrop-blur-md border-b border-primary/10 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-8">
+                <a href="/dashboard" class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                        <span class="font-bold text-white">T</span>
+                    </div>
+                    <span class="font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                        TicketFlow
+                    </span>
+                </a>
+
+                <div class="flex items-center gap-2 bg-secondary/50 p-1 rounded-full border border-primary/10">
+                    <a href="/dashboard" class="px-5 py-2 rounded-full transition-all {{ currentPage == 'dashboard' ? 'bg-card shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground' }}">
+                        Dashboard
+                    </a>
+                    <a href="/tickets" class="px-5 py-2 rounded-full transition-all {{ currentPage == 'tickets' ? 'bg-card shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground' }}">
+                        Tickets
+                    </a>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 px-3 py-2 bg-secondary/50 rounded-full">
+                    <i data-lucide="user" class="w-4 h-4 text-muted-foreground"></i>
+                    <span class="text-sm">{{ user.name|default('Admin') }}</span>
+                </div>
+                <a href="/logout" class="rounded-full p-2 hover:bg-secondary/50 transition-all">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
