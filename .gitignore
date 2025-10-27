@@ -1,7 +1,7 @@
 # Dependency management
 /vendor/
 /node_modules/
-
+/cache
 .bat 
 
 # Environment variables

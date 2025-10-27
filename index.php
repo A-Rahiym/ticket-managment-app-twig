@@ -1,16 +1,27 @@
 <?php
-session_start();
+// Set session save path to a persistent directory
+$sessionPath = __DIR__ . '/data/sessions';
+if (!is_dir($sessionPath)) {
+    mkdir($sessionPath, 0755, true);
+}
+session_save_path($sessionPath);
 
+// Initialize Twig
 require_once __DIR__ . '/vendor/autoload.php';
 
 use App\Router;
 use App\TicketManager;
 
-// Initialize Twig
+// Ensure data directory exists
+$dataDir = __DIR__ . '/data';
+if (!is_dir($dataDir)) {
+    mkdir($dataDir, 0755, true);
+}
+
 $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/templates');
 $twig = new \Twig\Environment($loader, [
-    'cache' => false, // Disable cache for development
-    'debug' => true,
+    'cache' => __DIR__ . '/cache', // Enable cache for production
+    'debug' => false, // Disable debug in production
 ]);
 
 // Initialize services
