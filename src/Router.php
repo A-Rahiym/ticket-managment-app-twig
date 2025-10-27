@@ -11,29 +11,33 @@ class Router
     {
         $this->twig = $twig;
         $this->ticketManager = $ticketManager;
+
+        // 🟢 Start session once when Router is initialized
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
     }
 
+    /**
+     * Main router entry point
+     */
     public function route($uri, $method)
     {
-        // Remove base path if needed
         $uri = rtrim($uri, '/');
-        if (empty($uri)) {
-            $uri = '/';
-        }
+        if (empty($uri)) $uri = '/';
 
-        // Check authentication
+        // 🟣 Session + flash retrieval for templates
         $isAuthenticated = isset($_SESSION['user']);
-        
-        // Get flash message and clear it
-        $flash = isset($_SESSION['flash']) ? $_SESSION['flash'] : null;
-        if ($flash) {
-            unset($_SESSION['flash']);
-        }
+        $flash = $_SESSION['flash'] ?? null;
+        unset($_SESSION['flash']); // remove after reading
 
         try {
             switch ($uri) {
                 case '/':
-                    echo $this->twig->render('landing.twig', ['flash' => $flash]);
+                    echo $this->twig->render('landing.twig', [
+                        'flash' => $flash,
+                        'user' => $_SESSION['user'] ?? null
+                    ]);
                     break;
 
                 case '/login':
@@ -60,10 +64,17 @@ class Router
                     }
                     break;
 
+                // 🟡 New endpoint: allows frontend JS to check session state
+                case '/session':
+                    $this->sendJson([
+                        'authenticated' => $isAuthenticated,
+                        'user' => $_SESSION['user'] ?? null
+                    ]);
+                    break;
+
                 case '/logout':
-                    session_destroy();
-                    header('Location: /');
-                    exit;
+                    $this->handleLogout();
+                    break;
 
                 case '/dashboard':
                     $this->requireAuth();
@@ -91,7 +102,8 @@ class Router
                     }
                     break;
 
-                case (preg_match('/^\/tickets\/(\d+)\/edit$/', $uri, $matches) ? true : false):
+                // 🔵 Edit ticket route
+                case (preg_match('/^\\/tickets\\/(\\d+)\\/edit$/', $uri, $matches) ? true : false):
                     $this->requireAuth();
                     $ticketId = $matches[1];
                     if ($method === 'POST') {
@@ -99,7 +111,8 @@ class Router
                     }
                     break;
 
-                case (preg_match('/^\/tickets\/(\d+)\/delete$/', $uri, $matches) ? true : false):
+                // 🔵 Delete ticket route
+                case (preg_match('/^\\/tickets\\/(\\d+)\\/delete$/', $uri, $matches) ? true : false):
                     $this->requireAuth();
                     $ticketId = $matches[1];
                     $this->handleTicketDelete($ticketId);
@@ -116,58 +129,131 @@ class Router
         }
     }
 
+    /**
+     * 🧩 Auth requirement for private pages
+     */
     private function requireAuth()
     {
         if (!isset($_SESSION['user'])) {
-            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Please log in to access this page.'];
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Please log in to continue.'];
             header('Location: /login');
             exit;
         }
     }
 
+    /**
+     * 🧩 Send JSON response utility
+     */
+    private function sendJson($data)
+    {
+        header('Content-Type: application/json');
+        echo json_encode($data);
+        exit;
+    }
+
+    /**
+     * Detects if request expects JSON (AJAX/fetch)
+     */
+    private function expectsJson()
+    {
+        $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
+        $xhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+        return $xhr || stripos($accept, 'application/json') !== false || isset($_GET['json']);
+    }
+
+    /**
+     * 🟢 Handle Login (server + localStorage sync)
+     */
     private function handleLogin()
     {
         $email = $_POST['email'] ?? '';
         $password = $_POST['password'] ?? '';
 
-        // Simple validation (in production, check against database)
         if (!empty($email) && !empty($password) && strlen($password) >= 6) {
             $_SESSION['user'] = [
                 'name' => 'Admin User',
                 'email' => $email
             ];
-            $_SESSION['flash'] = ['type' => 'success', 'message' => 'Successfully logged in!'];
+            $_SESSION['flash'] = ['type' => 'success', 'message' => 'Login successful!'];
+
+            if ($this->expectsJson()) {
+                // Return data for JS to save in localStorage as "ticketapp_session"
+                $this->sendJson([
+                    'status' => 'success',
+                    'user' => $_SESSION['user']
+                ]);
+            }
+
             header('Location: /dashboard');
             exit;
         } else {
+            if ($this->expectsJson()) {
+                $this->sendJson(['status' => 'error', 'message' => 'Invalid credentials']);
+            }
+
             $_SESSION['flash'] = ['type' => 'error', 'message' => 'Invalid credentials'];
             header('Location: /login');
             exit;
         }
     }
 
+    /**
+     * 🟢 Handle Signup
+     */
     private function handleSignup()
     {
         $name = $_POST['name'] ?? '';
         $email = $_POST['email'] ?? '';
         $password = $_POST['password'] ?? '';
 
-        // Simple validation
         if (!empty($name) && !empty($email) && !empty($password) && strlen($password) >= 6) {
             $_SESSION['user'] = [
                 'name' => $name,
                 'email' => $email
             ];
             $_SESSION['flash'] = ['type' => 'success', 'message' => 'Account created successfully!'];
+
+            if ($this->expectsJson()) {
+                $this->sendJson(['status' => 'success', 'user' => $_SESSION['user']]);
+            }
+
             header('Location: /dashboard');
             exit;
         } else {
-            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Invalid data'];
+            if ($this->expectsJson()) {
+                $this->sendJson(['status' => 'error', 'message' => 'Invalid signup data']);
+            }
+
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Invalid signup data'];
             header('Location: /signup');
             exit;
         }
     }
 
+    /**
+     * 🟠 Handle Logout — clears PHP session and (optionally) localStorage
+     */
+    private function handleLogout()
+    {
+        $_SESSION = [];
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000,
+                $params['path'], $params['domain'], $params['secure'], $params['httponly']
+            );
+        }
+        session_destroy();
+
+        if ($this->expectsJson()) {
+            $this->sendJson(['status' => 'success']);
+        }
+
+        header('Location: /');
+        exit;
+    }
+
+    // 🎫 Ticket Management Routes
     private function handleTicketCreate()
     {
         $data = [

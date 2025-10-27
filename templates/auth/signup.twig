@@ -18,7 +18,7 @@
             </div>
 
             <!-- Form -->
-            <form method="POST" action="/signup" class="space-y-5">
+            <form id="signupForm" class="space-y-5">
                 <div>
                     <label for="name" class="block text-sm mb-1.5">Full Name</label>
                     <input
@@ -74,4 +74,28 @@
         </div>
     </div>
 </div>
+
+<script>
+// 🧩 Intercept signup form submission to use fetch() and persist session
+document.getElementById('signupForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+
+  try {
+    const res = await fetch('/signup?json=1', { method: 'POST', body: formData });
+    const data = await res.json();
+
+    if (data.status === 'success') {
+      // 🟢 Save user session to localStorage
+      localStorage.setItem('ticketapp_session', JSON.stringify(data.user));
+      alert('Account created successfully!');
+      window.location.href = '/dashboard';
+    } else {
+      alert(data.message || 'Signup failed. Please check your input.');
+    }
+  } catch (err) {
+    alert('Signup failed. Please try again.');
+  }
+});
+</script>
 {% endblock %}

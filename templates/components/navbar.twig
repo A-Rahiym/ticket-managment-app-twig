@@ -12,10 +12,12 @@
                 </a>
 
                 <div class="flex items-center gap-2 bg-secondary/50 p-1 rounded-full border border-primary/10">
-                    <a href="/dashboard" class="px-5 py-2 rounded-full transition-all {{ currentPage == 'dashboard' ? 'bg-card shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground' }}">
+                    <a href="/dashboard"
+                       class="px-5 py-2 rounded-full transition-all {{ currentPage == 'dashboard' ? 'bg-card shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground' }}">
                         Dashboard
                     </a>
-                    <a href="/tickets" class="px-5 py-2 rounded-full transition-all {{ currentPage == 'tickets' ? 'bg-card shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground' }}">
+                    <a href="/tickets"
+                       class="px-5 py-2 rounded-full transition-all {{ currentPage == 'tickets' ? 'bg-card shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground' }}">
                         Tickets
                     </a>
                 </div>
@@ -26,10 +28,40 @@
                     <i data-lucide="user" class="w-4 h-4 text-muted-foreground"></i>
                     <span class="text-sm">{{ user.name|default('Admin') }}</span>
                 </div>
-                <a href="/logout" class="rounded-full p-2 hover:bg-secondary/50 transition-all">
+
+                <!-- 🧩 Added ID for logout script -->
+                <a id="logoutBtn" href="/logout" class="rounded-full p-2 hover:bg-secondary/50 transition-all">
                     <i data-lucide="log-out" class="w-4 h-4"></i>
                 </a>
             </div>
         </div>
     </div>
 </nav>
+
+<!-- 🧠 Logout Script: clears localStorage before redirect -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (!logoutBtn) return;
+
+  logoutBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    // Optional: confirm logout
+    if (!confirm('Are you sure you want to log out?')) return;
+
+    try {
+      // 🟢 Call logout route (clears PHP session)
+      await fetch('/logout?json=1');
+    } catch (err) {
+      console.warn('Logout request failed, clearing local session anyway.');
+    }
+
+    // 🧹 Clear client-side localStorage session
+    localStorage.removeItem('ticketapp_session');
+
+    // Redirect to home or login page
+    window.location.href = '/login';
+  });
+});
+</script>
